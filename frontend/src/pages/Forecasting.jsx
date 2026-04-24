@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ChartCard from '../components/ChartCard';
+import { MapPin } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const Forecasting = () => {
@@ -8,13 +9,36 @@ const Forecasting = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [targetMetric, setTargetMetric] = useState('incidence_rate'); // incidence_rate or cfr
+  const [selectedRegion, setSelectedRegion] = useState('all');
+
+  const regions = [
+    { value: 'all', label: '전국 (All Regions)' },
+    { value: '서울특별시', label: '서울특별시' },
+    { value: '부산광역시', label: '부산광역시' },
+    { value: '대구광역시', label: '대구광역시' },
+    { value: '인천광역시', label: '인천광역시' },
+    { value: '광주광역시', label: '광주광역시' },
+    { value: '대전광역시', label: '대전광역시' },
+    { value: '울산광역시', label: '울산광역시' },
+    { value: '세종특별자치시', label: '세종특별자치시' },
+    { value: '경기도', label: '경기도' },
+    { value: '강원특별자치도', label: '강원특별자치도' },
+    { value: '충청북도', label: '충청북도' },
+    { value: '충청남도', label: '충청남도' },
+    { value: '전라북도', label: '전라북도' },
+    { value: '전라남도', label: '전라남도' },
+    { value: '경상북도', label: '경상북도' },
+    { value: '경상남도', label: '경상남도' },
+    { value: '제주특별자치도', label: '제주특별자치도' }
+  ];
 
   const API_BASE = '/api';
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE}/stats/forecasting`);
+        const res = await axios.get(`${API_BASE}/stats/forecasting?region_name=${selectedRegion}`);
         setData(res.data);
       } catch (error) {
         console.error("Error fetching forecast data:", error);
@@ -23,7 +47,7 @@ const Forecasting = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [selectedRegion]);
 
   if (loading) return <div className="page-container">{t('forecast_engine')}</div>;
 
@@ -79,16 +103,45 @@ const Forecasting = () => {
 
   return (
     <div className="page-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h1>{t('forecast_title')}</h1>
-        <select 
-          value={targetMetric} 
-          onChange={(e) => setTargetMetric(e.target.value)}
-          className="select-input"
-        >
-          <option value="incidence_rate">{t('forecast_metric_inc')}</option>
-          <option value="cfr">{t('forecast_metric_cfr')}</option>
-        </select>
+      <div className="page-header" style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>
+              {t('forecast_title')}
+            </h1>
+          </div>
+          <select 
+            value={targetMetric} 
+            onChange={(e) => setTargetMetric(e.target.value)}
+            className="select-input"
+          >
+            <option value="incidence_rate">{t('forecast_metric_inc')}</option>
+            <option value="cfr">{t('forecast_metric_cfr')}</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="selector-panel" style={{ 
+        background: '#fff', 
+        padding: '20px', 
+        borderRadius: '16px', 
+        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.06)',
+        border: '1px solid #e2e8f0',
+        marginBottom: '32px'
+      }}>
+        <div className="responsive-flex" style={{ alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+            <span style={{ fontSize: '0.95rem', fontWeight: 600, color: '#334155', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={16} /> 분석 지역 선택</span>
+            <select 
+              value={selectedRegion} 
+              onChange={(e) => setSelectedRegion(e.target.value)}
+              className="select-input"
+              style={{ width: '100%', maxWidth: '300px' }}
+            >
+              {regions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="kpi-grid">

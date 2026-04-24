@@ -285,8 +285,12 @@ async def get_geographic_stats(
 
 
 @app.get("/api/stats/forecasting")
-async def get_forecasting():
+async def get_forecasting(region_name: Optional[str] = None):
     """2030 예측 시뮬레이션 (7-1, 7-2 영역)"""
+    where_str = "1=1"
+    if region_name and region_name != "all":
+        where_str = f"region_name = '{region_name}'"
+
     query = f"""
         SELECT 
             year,
@@ -294,6 +298,7 @@ async def get_forecasting():
             SUM(person_years) as person_years,
             SUM(death_within_28days) as deaths
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
+        WHERE {where_str}
         GROUP BY year
         ORDER BY year
     """
