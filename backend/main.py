@@ -219,8 +219,13 @@ async def get_cross_analysis(
 
 
 @app.get("/api/stats/disparity/income")
-async def get_income_disparity(year: int = 2024):
+async def get_income_disparity(year: int = 2024, region_name: Optional[str] = None):
     """소득 수준별 격차 분석 (3-3, 3-4 영역)"""
+    # 지역 필터 조건 추가
+    where_clause = f"year = {year}"
+    if region_name and region_name != "all":
+        where_clause += f" AND region_name = '{region_name}'"
+
     query = f"""
         SELECT 
             income_level,
@@ -228,7 +233,7 @@ async def get_income_disparity(year: int = 2024):
             SUM(person_years) as person_years,
             SUM(death_within_28days) as deaths
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
-        WHERE year = {year}
+        WHERE {where_clause}
         GROUP BY income_level
         ORDER BY income_level
     """
