@@ -23,3 +23,15 @@ Thumbs.db
 
 # GCP
 .gcloudignore
+
+# Security & Credentials (비밀번호 및 비밀 열쇠 차단)
+.env
+*.json
+!visitor_stats.json
+credentials.json
+
+# Raw Medical Data Files (원시 환자 데이터 유출 차단)
+data/*.csv
+data/*.xlsx
+data/*.xls
+
